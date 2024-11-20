@@ -7,12 +7,11 @@ from datetime import datetime
 
 # 音声再生用の初期設定
 pygame.mixer.init()
-SOUND_PATH_1 = "next_shinagawa.mp3"  # 1つ目の音声ファイルのパス
-SOUND_PATH_2 = "mamonakku_shinagawa.mp3"  # 2つ目の音声ファイルのパス
+SOUND_PATH = "bell_tokyo.mp3"  # 再生したい音声ファイルのパス
 
 # テンプレート画像の読み込み
-TEMPLATE_PATH_1 = "zankyori.jpg"  # 1つ目のテンプレート画像のパス
-TEMPLATE_PATH_2 = "zankyori2.jpg"  # 2つ目のテンプレート画像のパス
+TEMPLATE_PATH_1 = "tokyo.jpg"  # 1つ目のテンプレート画像のパス
+TEMPLATE_PATH_2 = "bell_tokyo2.jpg"  # 2つ目のテンプレート画像のパス
 
 template_1 = cv2.imread(TEMPLATE_PATH_1, cv2.IMREAD_GRAYSCALE)
 template_2 = cv2.imread(TEMPLATE_PATH_2, cv2.IMREAD_GRAYSCALE)
@@ -64,22 +63,17 @@ def check_screen():
     min_val_2, max_val_2, min_loc_2, max_loc_2 = cv2.minMaxLoc(result_2)
 
     # 一致度の閾値を設定
-    threshold = 0.9
+    threshold = 0.95
 
-    if max_val_1 >= threshold:
+    # 両方のテンプレートが一致した場合のみ音声を再生
+    if max_val_1 >= threshold and max_val_2 >= threshold:
         print(f"テンプレート1 一致: 信頼度 {max_val_1:.2f}")
-        save_screenshot(screenshot, "_template_1")  # 一致時にスクリーンショットを保存
-        play_sound(SOUND_PATH_1)  # 1つ目の音声を再生
-        last_action_time = current_time  # 最後にアクションを実行した時間を更新
-
-    elif max_val_2 >= threshold:
         print(f"テンプレート2 一致: 信頼度 {max_val_2:.2f}")
-        save_screenshot(screenshot, "_template_2")  # 一致時にスクリーンショットを保存
-        play_sound(SOUND_PATH_2)  # 2つ目の音声を再生
+        save_screenshot(screenshot, "_both_templates")  # 一致時にスクリーンショットを保存
+        play_sound(SOUND_PATH)  # 音声を再生
         last_action_time = current_time  # 最後にアクションを実行した時間を更新
-
     else:
-        print("テンプレート不一致")
+        print(f"テンプレート不一致: テンプレート1={max_val_1:.2f}, テンプレート2={max_val_2:.2f}")
 
 def main():
     """画像認識をループで実行"""
